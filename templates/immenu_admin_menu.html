@@ -1,0 +1,14 @@
+<{if $immenu_menu_title}>
+	<h1><{$immenu_menu_title}></h1>
+<{/if}>
+<{if $immenu_menu_info}>
+	<p><{$immenu_menu_info}></p><
+<{/if}>
+
+<{if $immenu_menu_table}>
+	<{$immenu_menu_table}>
+<{/if}>
+
+<{if $addmenu}>
+	<{includeq file='db:system_common_form.html' form=$addmenu}>
+<{/if}>
