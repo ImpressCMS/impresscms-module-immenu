@@ -9,6 +9,10 @@
  * @version $Id:$
  */
 
+define('_IMMENU_TYPE_REMOTE', 1);
+define('_IMMENU_TYPE_LOCAL', 2);
+define('_IMMENU_TYPE_LOCAL_FULL', 3);
+
 /**
  * ImMenu Menu Item Object Class
  *
@@ -28,34 +32,55 @@ class ImmenuMenuitem extends IcmsPersistableObject{
 
     	$this->IcmsPersistableObject($handler);
 
-        $this->quickInitVar('menuitem_id', XOBJ_DTYPE_INT, true,"id");
-        $this->quickInitVar('menuitem_menu_id', XOBJ_DTYPE_INT, true, "menu_id");
+        $this->quickInitVar('menuitem_id', XOBJ_DTYPE_INT, true,_AM_IMMENU_MENUITEM_ID,_AM_IMMENU_MENUITEM_ID_DSC);
+        $this->quickInitVar('menuitem_menu_id', XOBJ_DTYPE_INT, true);
         $this->hideFieldFromForm('menuitem_menu_id');
-        //$this->quickInitVar('menuitem_parent_id', XOBJ_DTYPE_INT,false, "parent id");
-        $this->quickInitVar('menuitem_title', XOBJ_DTYPE_TXTBOX,false,"title");
+        $this->quickInitVar('menuitem_title', XOBJ_DTYPE_TXTBOX,false,_AM_IMMENU_MENUITEM_TITLE, _AM_IMMENU_MENUITEM_TITLE_DSC);
         $this->setFieldAsRequired('menuitem_title');
-        $this->quickInitVar('menuitem_desc', XOBJ_DTYPE_TXTAREA,false,"desc");
-        $this->quickInitVar('menuitem_url', XOBJ_DTYPE_TXTBOX,false,"url");   
+        $this->quickInitVar('menuitem_desc', XOBJ_DTYPE_TXTAREA, false, _AM_IMMENU_MENUITEM_DESC,_AM_IMMENU_MENUITEM_DESC_DSC);
+        $this->quickInitVar('menuitem_parent_id', XOBJ_DTYPE_INT, false, _AM_IMMENU_MENUITEM_PARENTID,_AM_IMMENU_MENUITEM_PARENTID_DSC);
+        $this->quickInitVar('menuitem_weight', XOBJ_DTYPE_INT, true, _AM_IMMENU_MENUITEM_WEIGHT,_AM_IMMENU_MENUITEM_WEIGHT_DSC, 0);
+        $this->quickInitVar('menuitem_url', XOBJ_DTYPE_TXTBOX,false, _AM_IMMENU_MENUITEM_URL,_AM_IMMENU_MENUITEM_URL_DSC);
         $this->setFieldAsRequired('menuitem_url');
-        $this->quickInitVar('menuitem_weight', XOBJ_DTYPE_INT, true,"weight");
-        $this->quickInitVar('menuitem_status', XOBJ_DTYPE_INT, false, "status", false, true);
-        $this->quickInitVar('menuitem_hits', XOBJ_DTYPE_INT,true,"hits");
-		$this->hideFieldFromForm('menuitem_hits');
+        $this->quickInitVar('menuitem_type', XOBJ_DTYPE_INT, true,_AM_IMMENU_MENUITEM_TYPE,_AM_IMMENU_MENUITEM_TYPE_DSC);
+        $this->hideFieldFromForm('menuitem_type');
+        $this->quickInitVar('menuitem_status', XOBJ_DTYPE_INT, false, _AM_IMMENU_MENUITEM_STATUS,_AM_IMMENU_MENUITEM_STATUS_DSC, true);
+        
+        $this->quickInitVar('menuitem_hits', XOBJ_DTYPE_INT, false, _AM_IMMENU_MENUITEM_HITS,_AM_IMMENU_MENUITEM_HITS_DSC);
+	
+        $this->quickInitVar('menuitem_docount', XOBJ_DTYPE_INT, false, _AM_IMMENU_MENUITEM_DOCOUNT,_AM_IMMENU_MENUITEM_DOCOUNT_DSC, false);
+		
+		//$this->initCommonVar('counter', false);
 		
 		$this->setControl('menuitem_status', 'yesno');
-		/*
+		
+		$this->setControl('menuitem_docount', 'yesno');
+		
 		$this->setControl('menuitem_parent_id', array( 'itemHandler' => 'menuitem',
-											    'method' => 'getMenuitem_parentIdArray',
+											    'method' => 'getMenuitemParentIdArray',
 											    'module' => 'immenu'
 											  ));
-		*/
+		
+		
+		$this->setControl('menuitem_type', array( 'itemHandler' => 'menuitem',
+											    'method' => 'getMenuitemTypeArray',
+											    'module' => 'immenu'
+											  ));
 	}
-	
-	function getVar($key, $format = 's') {
-        if ($format == 's' && in_array($key, array('menuitem_status'))) {
+		
+	public function getVar($key, $format = 's') {
+        if ($format == 's' && in_array($key, array('menuitem_status','menuitem_hits'))) {
             return call_user_func(array($this,$key));
         }
         return parent::getVar($key, $format);
+    }
+    
+    private function menuitem_hits(){
+    	if($this->getVar('menuitem_docount') == 1){
+    		return $this->getVar('menuitem_hits','e');
+    	}else{
+    		return _AM_IMMENU_MENUITEM_NOCOUNTER;
+    	}
     }
     
     private function menuitem_status(){
@@ -71,15 +96,15 @@ class ImmenuMenuitem extends IcmsPersistableObject{
     }
         
     public function getWeightUpButton(){
-		$ret = "<a href='".IMMENU_ADMIN_URL."menuitem.php?menu_id=".$this->getVar('menuitem_menu_id')."&menuitem_id=".$this->getVar('menuitem_id')."&op=wu' title='"._CO_IMMENU_MENUITEM_ADMIN_ITEMS."'>";
-		$ret .= "<img src='".ICMS_URL."/images/crystal/actions/up.png' alt='"._CO_IMMENU_MENUITEM_ADMIN_ITEMS."'/>";
+		$ret = "<a href='".IMMENU_ADMIN_URL."menuitem.php?menu_id=".$this->getVar('menuitem_menu_id')."&menuitem_id=".$this->getVar('menuitem_id')."&op=wu' title='"._AM_IMMENU_MENUITEM_WU_ITEM."'>";
+		$ret .= "<img src='".ICMS_URL."/images/crystal/actions/up.png' alt='"._AM_IMMENU_MENUITEM_WU_ITEM."'/>";
 		$ret .= "</a>";
 		return $ret;
 	}
 	
 	public function getWeightDownButton(){
-		$ret = "<a href='".IMMENU_ADMIN_URL."menuitem.php?menu_id=".$this->getVar('menuitem_menu_id')."&menuitem_id=".$this->getVar('menuitem_id')."&op=wd' title='"._CO_IMMENU_MENUITEM_ADMIN_ITEMS."'>";
-		$ret .= "<img src='".ICMS_URL."/images/crystal/actions/down.png' alt='"._CO_IMMENU_MENUITEM_ADMIN_ITEMS."'/>";
+		$ret = "<a href='".IMMENU_ADMIN_URL."menuitem.php?menu_id=".$this->getVar('menuitem_menu_id')."&menuitem_id=".$this->getVar('menuitem_id')."&op=wd' title='"._AM_IMMENU_MENUITEM_WD_ITEM."'>";
+		$ret .= "<img src='".ICMS_URL."/images/crystal/actions/down.png' alt='"._AM_IMMENU_MENUITEM_WD_ITEM."'/>";
 		$ret .= "</a>";
 		return $ret;
 	}
@@ -116,15 +141,22 @@ class ImmenuMenuitemHandler extends IcmsPersistableObjectHandler {
 	 *
 	 * todo: Improve!!! this is a shit!
 	 */
-	public function getMenuitem_parentIdArray(){		
-		$criteria = new CriteriaCompo();
-		$criteria->add(new Criteria('menuitem_menu_id', $_GET['menu_id']));
-		$ret = $this->getList($criteria);
+	public function getMenuitemParentIdArray(){		
+		//$criteria = new CriteriaCompo();
+		//$criteria->add(new Criteria('menuitem_menu_id', $_GET['menu_id']));
+		//$ret = $this->getList($criteria);
 		$ret[0] = "---";
 		ksort($ret);
 		return $ret;
 	}
 	
+	public function getMenuitemTypeArray(){
+		$ret = array();
+		$ret[_IMMENU_TYPE_REMOTE] = _AM_IMMENU_MENUITEM_TYPE_REMOTE;
+		$ret[_IMMENU_TYPE_LOCAL] = _AM_IMMENU_MENUITEM_TYPE_LOCAL;
+		$ret[_IMMENU_TYPE_LOCAL_FULL] = _AM_IMMENU_MENUITEM_TYPE_LOCAL_FULL;
+		return $ret;
+	}
 	
     function getItemsForBlock($menu_id) {
 		$criteria = new CriteriaCompo();

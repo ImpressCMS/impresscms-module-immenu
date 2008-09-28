@@ -7,15 +7,15 @@ class ImmenuMenu extends IcmsPersistableObject{
 
     	$this->IcmsPersistableObject($handler);
 
-        $this->quickInitVar('menu_id', XOBJ_DTYPE_INT, true,_AM_IMMENU_MENU_ID);
-        $this->quickInitVar('menu_title', XOBJ_DTYPE_TXTBOX,false ,_AM_IMMENU_MENU_TITLE);
+        $this->quickInitVar('menu_id', XOBJ_DTYPE_INT, true,_AM_IMMENU_MENU_ID, _AM_IMMENU_MENU_ID_DSC);
+        $this->quickInitVar('menu_title', XOBJ_DTYPE_TXTBOX,false ,_AM_IMMENU_MENU_TITLE , _AM_IMMENU_MENU_TITLE_DSC);
         $this->setFieldAsRequired('menu_title');
-        $this->quickInitVar('menu_desc', XOBJ_DTYPE_TXTAREA,false,_AM_IMMENU_MENU_DESC);
-        $this->quickInitVar('menu_template', XOBJ_DTYPE_TXTBOX,false,_AM_IMMENU_MENU_TEMPLATE);
+        $this->quickInitVar('menu_desc', XOBJ_DTYPE_TXTAREA,false,_AM_IMMENU_MENU_DESC, _AM_IMMENU_MENU_DESC_DSC);
+        $this->quickInitVar('menu_template', XOBJ_DTYPE_INT,false,_AM_IMMENU_MENU_TEMPLATE, _AM_IMMENU_MENU_TEMPLATE_DSC);
         $this->setFieldAsRequired('menu_template');
-        $this->quickInitVar('menu_creation_date', XOBJ_DTYPE_LTIME,false,_AM_IMMENU_MENU_CREATION_DATE);
-        $this->quickInitVar('menu_modification_date', XOBJ_DTYPE_LTIME,false,_AM_IMMENU_MODIFICATION_DATE);
-        $this->quickInitVar('menu_bid', XOBJ_DTYPE_INT,false,_AM_IMMENU_MENU_BID);
+        $this->quickInitVar('menu_creation_date', XOBJ_DTYPE_LTIME,false,_AM_IMMENU_MENU_CREATION_DATE, _AM_IMMENU_MENU_CREATION_DATE_DSC);
+        $this->quickInitVar('menu_modification_date', XOBJ_DTYPE_LTIME,false,_AM_IMMENU_MENU_MODIFICATION_DATE, _AM_IMMENU_MENU_MODIFICATION_DATE_DSC);
+        $this->quickInitVar('menu_bid', XOBJ_DTYPE_INT);
         
         $this->hideFieldFromForm('menu_bid');
         $this->hideFieldFromForm('menu_creation_date');
@@ -36,14 +36,16 @@ class ImmenuMenu extends IcmsPersistableObject{
     }
     
     private function menu_template(){
-    	//$ret = "<a href='template.php?op=mod&template_id=".$this->getVar('menu_template','e')."'>".$this->getVar('menu_template', 'e')."</a>"; 
-    	$ret = $this->getVar('menu_template', 'e');
+    	$immenu_template_handler = xoops_getModuleHandler('template');
+    	$template = $immenu_template_handler->get($this->getVar('menu_template', 'e'));
+    	$ret = "<a href='template.php?op=mod&template_id=".$template->getVar('template_id')."'>".$template->getVar('template_title')."</a>"; 
+    	//$ret = $this->getVar('menu_template', 'e');
     	return $ret;
     }	
 	
 	public function getMenuItemListButton(){
-		$ret = "<a href='".IMMENU_ADMIN_URL."menuitem.php?menu_id=".$this->getVar('menu_id')."' title='"._CO_IMMENU_MENUITEM_ADMIN_ITEMS."'>";
-		$ret .= "<img src='".ICMS_URL."/images/crystal/actions/filenew2.png' alt='"._CO_IMMENU_MENUITEM_ADMIN_ITEMS."'/>";
+		$ret = "<a href='".IMMENU_ADMIN_URL."menuitem.php?menu_id=".$this->getVar('menu_id')."' title='"._AM_IMMENU_MENU_ADMIN_ITEMS."'>";
+		$ret .= "<img src='".ICMS_URL."/images/crystal/actions/filenew2.png' alt='"._AM_IMMENU_MENU_ADMIN_ITEMS."'/>";
 		$ret .= "</a>";
 		return $ret;
 	}
@@ -59,7 +61,7 @@ class ImmenuMenuHandler extends IcmsPersistableObjectHandler {
 	public function getMenuTemplateArray(){
 		$immenu_menu_handler = xoops_getModuleHandler('template');
 		foreach($immenu_menu_handler->getObjects() as $template){
-			$ret[$template->getVar('template_title')] = $template->getVar('template_title');
+			$ret[$template->getVar('template_id')] = $template->getVar('template_title');
 		}
 		return $ret;
 	}
@@ -78,7 +80,7 @@ class ImmenuMenuHandler extends IcmsPersistableObjectHandler {
 	
 			$block->setVar("name", $obj->getVar('menu_title'));
 			$block->setVar("title", $obj->getVar('menu_title'));
-		    $block->setVar('template', 'immenu_menu_block_'.md5($obj->getVar('menu_template')).".html");
+		    $block->setVar('template', 'immenu_menu_block_tpl'.$obj->getVar('menu_template',"e").".html");
 		    $block->setVar('last_modified', mktime());
 		    
 		    if($block_handler->insert($block)){
@@ -105,7 +107,7 @@ class ImmenuMenuHandler extends IcmsPersistableObjectHandler {
 		    $block->setVar('func_file', 'menu.php');
 		    $block->setVar('show_func', 'immenu_menu_show');
 		    $block->setVar('edit_func', '');
-		    $block->setVar('template', 'immenu_menu_block_'.md5($obj->getVar('menu_template')).".html");
+		    $block->setVar('template', 'immenu_menu_block_tpl'.$obj->getVar('menu_template',"e").".html");
 		    $block->setVar('bcachetime', 0);
 		    $block->setVar('last_modified', mktime());
 		    
@@ -147,6 +149,15 @@ class ImmenuMenuHandler extends IcmsPersistableObjectHandler {
 	    return false;
 	}
 	
+	public function beforeDelete(&$obj){
+		$block_handler =& xoops_gethandler('block');
+		$block = $block_handler->get($obj->getVar('menu_bid'));
+		if($block_handler->delete($block)){
+			return true;
+		}
+		return false;
+	}
+	
 	/**
 	 * Get the items to be shown in a block
 	 *
@@ -161,14 +172,18 @@ class ImmenuMenuHandler extends IcmsPersistableObjectHandler {
 		$criteria->add(new Criteria('menuitem_status', 1));
 		$criteria->setSort("menuitem_weight");
 		$criteria->setSort("menuitem_id");
-		$menus = $immenu_menuitem_handler->getObjects($criteria);
+		$items = $immenu_menuitem_handler->getObjects($criteria);
 		$ret = array();
-		foreach( $menus as $menu){
-			$ret[] = array("title"=>$menu->getVar('menuitem_title'),"url"=>$menu->getVar('menuitem_url'));
+		foreach( $items as $item){
+			if( $item->getVar('menuitem_docount') == 1 ){
+				$item_url = IMMENU_URL."/menuitem.php?menuitem_id=".$item->getVar('menuitem_id');
+			}else{
+				$item_url = $item->getVar('menuitem_url');	
+			}
+			$ret[] = array("title"=>$item->getVar('menuitem_title'),"url"=>$item_url);
 		}
 		return $ret;
 	}
 	
 }
-
 ?>

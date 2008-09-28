@@ -28,10 +28,12 @@ $modversion['dirname'] = basename( dirname( __FILE__ ) ) ;
 
 // Definition of the module.
 // This will be applicated in 1.2... when the core get modularized.
+/*
 $modversion['category']['id'] = _ICMS_MODULE_CATEGORY_CORE_EXTENSION;
 $modversion['category']['name'] = _ICMS_MODULE_CATEGORY_CORE_EXTENSION_TITLE;
 $modversion['type']['id'] = _ICMS_MODULE_TYPE_MENU;
 $modversion['type']['name'] = _ICMS_MODULE_TYPE_MENU_TITLE;
+*/
 
 /**
  * Images information
@@ -61,7 +63,7 @@ $modversion['people']['developers'][] = "Gustavo Pilla nekro@impresscms.org";
 //$modversion['people']['translators'][] = "";
 //$modversion['people']['documenters'][] = "";
 $modversion['people']['other'][] = "sato-san";
-$modversion['warning'] = _CO_SOBJECT_WARNING_BETA;
+//$modversion['warning'] = _CO_SOBJECT_WARNING_ALPHA;
 
 /**
  * Administrative information

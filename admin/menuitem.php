@@ -34,11 +34,11 @@ switch($op){
 		xoops_cp_header();
 		$postObj = $immenu_menu_handler->get($menuitem_id);
 		if (!$postObj->isNew()){
-			$xoopsModule->displayAdminMenu(0, _AM_IMMENU_MENUS_." > "._AM_IMMENU_MENUITEMS . " > " . _CO_ICMS_EDITING);
+			$xoopsModule->displayAdminMenu(0, _AM_IMMENU_MENUS." > "._AM_IMMENU_MENUITEMS . " > " . _CO_ICMS_EDITING);
 			$sform = $postObj->getForm(_AM_IMMENU_MENUITEM_EDIT, 'addmenuitem');
 			$sform->assign($icmsAdminTpl);
 		}else{
-			$xoopsModule->displayAdminMenu(0, _AM_IMMENU_MENUS_." > ".AM_IMMENU_MENUITEMS . " > " . _CO_ICMS_CREATINGNEW);
+			$xoopsModule->displayAdminMenu(0, _AM_IMMENU_MENUS." > "._AM_IMMENU_MENUITEMS . " > " . _CO_ICMS_CREATINGNEW);
 			$sform = $postObj->getForm(_AM_IMMENU_MENUITEM_CREATE, 'addmenuitem');
 			$sform->assign($icmsAdminTpl);
 		}
@@ -58,7 +58,7 @@ switch($op){
 		include_once ICMS_ROOT_PATH."/kernel/icmspersistabletable.php";
 	
 		xoops_cp_header();	
-		$xoopsModule->displayAdminMenu(0, _AM_IMMENU_MENUS_." > "._AM_IMMENU_MENUITEMS);
+		$xoopsModule->displayAdminMenu(0, _AM_IMMENU_MENUS." > "._AM_IMMENU_MENUITEMS);
 		
 		// Defining the "criteria" to load in the table.
 		$criteria = new CriteriaCompo();
@@ -73,6 +73,7 @@ switch($op){
 		$objectTable->addColumn(new IcmsPersistableColumn('menuitem_desc', 'left'));
 		$objectTable->addColumn(new IcmsPersistableColumn('menuitem_url', 'left'));
 		$objectTable->addColumn(new IcmsPersistableColumn('menuitem_weight', 'center'));
+		$objectTable->addColumn(new IcmsPersistableColumn('menuitem_hits', 'center'));
 		
 		
 		// Adding extra controls to the table object.

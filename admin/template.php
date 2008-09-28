@@ -16,13 +16,15 @@ $template_id = isset($_GET['template_id']) ? intval($_GET['template_id']) : 0 ;
 switch($op){
 	case "clone":
 		xoops_cp_header();
-		$template_id = isset($_GET['template_id']) ? intval($_GET['template_id']) : 0 ;
-		//echo $template_id;
-		$template = $immenu_template_handler->get($template_id);
-		$xoopsModule->displayAdminMenu(1, _AM_IMMENU_TEMPLATES . " > " . _CO_ICMS_CLONE);
-		$sform = $template->getForm(_AM_IMMENU_TEMPLATE_EDIT, 'addtemplate');
-		$sform->assign($icmsAdminTpl);
-		
+		$postObj = $immenu_template_handler->get($template_id);
+		$postObj->setVar('template_title', $postObj->getVar('template_title')." (cloned)");
+		$postObj->setVar('template_id', 0);
+		if (!$postObj->isNew()){
+			$xoopsModule->displayAdminMenu(1, _AM_IMMENU_TEMPLATES . " > " . _CO_ICMS_CLONE);
+			$sform = $postObj->getForm(_AM_IMMENU_TEMPLATE_EDIT, 'addtemplate');
+			$sform->assign($icmsAdminTpl);
+		}
+		$icmsAdminTpl->display('db:immenu_admin_template.html');
 		break;
 	case "mod":
 	case "changedField":

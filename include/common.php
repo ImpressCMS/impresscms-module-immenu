@@ -18,7 +18,7 @@ if(!defined("IMMENU_IMAGES_URL"))	define("IMMENU_IMAGES_URL", IMMENU_URL.'images
 if(!defined("IMMENU_ADMIN_URL"))	define("IMMENU_ADMIN_URL", IMMENU_URL.'admin/');
 
 // Include the common language file of the module
-icms_loadLanguageFile('IMMENU', 'common');
+icms_loadLanguageFile('immenu', 'common');
 
 include_once(IMMENU_ROOT_PATH . "include/functions.php");
 

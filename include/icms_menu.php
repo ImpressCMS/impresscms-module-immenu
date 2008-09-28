@@ -12,15 +12,15 @@
 $i = -1;
 
 $i++;
-$adminmenu[$i]['title'] = _MI_IMMENU_MENUS;
+$adminmenu[$i]['title'] = _AM_IMMENU_MENUS;
 $adminmenu[$i]['link'] = "admin/menu.php";
 
 $i++;
-$adminmenu[$i]['title'] = _MI_IMMENU_MENU_TEMPLATES;
+$adminmenu[$i]['title'] = _AM_IMMENU_MENU_TEMPLATES;
 $adminmenu[$i]['link'] = "admin/template.php";
 
 $i++;
-$adminmenu[$i]['title'] = _MI_IMMENU_BLOCKS;
+$adminmenu[$i]['title'] = _AM_IMMENU_BLOCKS;
 $adminmenu[$i]['link'] = "admin/block.php";
 
 
