@@ -124,6 +124,7 @@ class ImmenuMenuitemHandler extends IcmsPersistableObjectHandler {
 	 */
 	public function __construct($db){
 		$this->IcmsPersistableObjectHandler($db, 'menuitem', 'menuitem_id', 'menuitem_title', 'menuitem_desc', 'immenu');
+		$this->addPermission('menuitem_view', _CO_IMMENU_MENUITEM_PERM_VIEW, _CO_IMMENU_MENUITEM_PERM_VIEW_DSC);
 	}
 	
 	/**

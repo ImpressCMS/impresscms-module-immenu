@@ -81,12 +81,6 @@ class ImmenuTemplateHandler extends IcmsPersistableObjectHandler {
 	}
 	
 	public function beforeSave(&$obj){
-		//echo $obj->getVar('template_source');
-		return true;
-				
-	}
-	
-	public function afterSave(&$obj){
 		global $xoopsModule;
 		
 		$tplfile_handler =& xoops_gethandler('tplfile');
@@ -117,15 +111,15 @@ class ImmenuTemplateHandler extends IcmsPersistableObjectHandler {
 			$tplfile->setVar('tpl_lastimported', 0);
 			$tplfile->setVar('tpl_type', 'block');
 			if ($tplfile_handler->insert($tplfile)) {
-				//$obj->setVar('template_tpl_id', $tplfile->getVar('tpl_id'));
-				//$this->insert($obj);
 				return true;
 			}else{
-				$this->delete($obj);
+				echo "no insert";
 				return false;
 			}
 		}
 	}
+	
+	
 	
 	public function beforeDelete(&$obj){
 		$tplfile_handler =& xoops_gethandler('tplfile');
